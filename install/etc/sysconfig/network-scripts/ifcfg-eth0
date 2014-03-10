@@ -1,0 +1,15 @@
+DEVICE="eth0"
+#BOOTPROTO=
+HWADDR="00:16:76:9D:11:AC"
+IPV6INIT="yes"
+IPV6_AUTOCONF="yes"
+NM_CONTROLLED="yes"
+ONBOOT="yes"
+TYPE="Ethernet"
+UUID="e17384be-1f37-47fa-8198-45a9bf8d1d8b"
+
+
+
+
+
+BRIDGE=xenbr0

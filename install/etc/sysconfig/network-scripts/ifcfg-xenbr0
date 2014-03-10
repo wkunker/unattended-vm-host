@@ -1,0 +1,7 @@
+DEVICE="xenbr0"
+NM_CONTROLLED="yes"
+ONBOOT=yes
+TYPE=Bridge
+BOOTPROTO=dhcp
+IPV6INIT=no
+
