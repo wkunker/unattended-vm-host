@@ -1,8 +1,32 @@
 #!/bin/bash
 
 NETWORKDEVICE="ifcfg-eth0"
+VMMEM="512M"
+VMMEMMAX="512M"
 
-yum install -y virt-install nmap libvirt bridge-utils
+yum install -y centos-release-xen
+yum install -y virt-install nmap libvirt bridge-utils xen
+
+# Get full path to this script.
+pushd `dirname $0` > /dev/null
+SCRIPTPATH=`pwd`
+popd > /dev/null
+
+# Remove any startup entries that may exist for this script.
+#sed -i "s@^bash $SCRIPTPATH@@g" "/etc/rc.local"
+
+# Check to see if the Xen-compatible kernel is active.
+NRDY=$(uname -r | grep ^2.6..* | wc -l)
+if [ "$NRDY" -ne "0" ]
+then
+	# Set the install script to run again after reboot.
+	#echo "bash $SCRIPTPATH" >> "/etc/rc.local"
+
+	# Install the kernel, set default boot entry and mem, and reboot.
+	/usr/bin/grub-bootxen.sh
+	sed -i "s@dom0_mem=1024M,max:1024M@dom0_mem=$VMMEM,max:$VMMEMMAX@g" "/boot/grub/grub.conf"
+	reboot
+fi
 
 ./clean.sh
 
@@ -36,7 +60,7 @@ virsh start vm-guest
 sleep 120 # TODO: find a way to detect when the OS has finished loading.
 
 # Get IP address of vm-guest. First the MAC address must be obtained.
-VMGUESTMACADDR=$(xl network-list vm-guest | awk '{print $3}' | grep -v Mac)
+#VMGUESTMACADDR=$(xl network-list vm-guest | awk '{print $3}' | grep -v Mac)
 
-VMGUESTIPADDR=$(nmap -sP 192.168.1.0/24 | grep -B 2  | grep hostname_here | awk '{print 2}')
+#VMGUESTIPADDR=$(nmap -sP 192.168.1.0/24 | grep -B 2  | grep hostname_here | awk '{print 2}')
 
